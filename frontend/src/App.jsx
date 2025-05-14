@@ -6,29 +6,34 @@ import PopupRoom from "./components/body/popupRoom.jsx";
 function App() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedRoomTitle, setSelectedRoomTitle] = useState("");
+  const [selectedRoomImages, setSelectedRoomImages] = useState([]); // New state for images
   const [meetingRoomsData, setMeetingRoomsData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const handleReserveClick = (title) => {
+  const handleReserveClick = (title, images) => {
     setSelectedRoomTitle(title);
+    setSelectedRoomImages(images); // Set images when reserving
     setIsPopupOpen(true);
   };
 
   const handleClosePopup = () => {
     setIsPopupOpen(false);
-    setSelectedRoomTitle(""); // Clear the title when closing
+    setSelectedRoomTitle("");
+    setSelectedRoomImages([]); // Clear images on close
   };
 
   useEffect(() => {
     const fetchMeetingRooms = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/meeting-rooms");
+        const response = await fetch(
+          "http://172.16.0.95:3001/api/meeting-rooms"
+        );
         const data = await response.json();
-        setMeetingRoomsData(data); // Assume `data` contains `room_names`, `room_img`, and `subcategories`
+        setMeetingRoomsData(data);
       } catch (error) {
         console.error("Error fetching meeting rooms data:", error);
       } finally {
-        setLoading(false); // Set loading to false after fetching
+        setLoading(false);
       }
     };
 
@@ -51,36 +56,31 @@ function App() {
     );
   }
 
-  // Get the subcategories of the selected room
-  const selectedRoom = meetingRoomsData.find(
-    (room) => room.room_names === selectedRoomTitle
-  );
-  const subcategories = selectedRoom?.subcategories || []; // Extract subcategories or default to empty array
-
   return (
-    <div className="min-h-screen bg-gray-100 w-full">
+    <div className="bg-gray-100 w-full h-screen flex flex-col">
       {/* Header */}
-      <div className="z-50 h-fit w-full bg-white flex justify-between items-center py-3 px-5 md:px-10 shadow-sm">
+      <div className="sticky top-0 bg-white flex justify-between items-center py-3 px-5 md:px-10 shadow-sm">
         <div className="flex items-center gap-3">
           <img
             className="h-12 w-auto"
-            src="./src/assets/img/frontlogo.png"
+            src="https://bonchon.com.ph/storage/cms_images/F2y4LTagCiGIOr8Y1fHcQZeM5cOaE661oABy6ftT.png"
             alt="Bonchon Logo"
           />
-          <h2 className="text-lg font-semibold">Booking</h2>
+          <h2 className="text-lg font-semibold text-black">Booking</h2>
         </div>
-        <SidebarWithBurgerMenu />
       </div>
 
       {/* Body */}
-      <div className="flex flex-col justify-center items-center w-full h-full py-5 lg:py-20 px-4 md:px-10 overflow-hidden">
-        <div className="flex flex-wrap justify-center w-full lg:max-w-screen-2xl">
+      <div className="flex-1 overflow-auto py-5 px-4 md:px-10">
+        <div className="flex flex-wrap justify-center w-full lg:max-w-screen-2xl mx-auto">
           {meetingRoomsData.map((room, index) => (
             <MeetingRooms
               key={index}
               title={room.room_names}
               imgSrc={room.room_img}
-              onReserve={handleReserveClick}
+              onReserve={() =>
+                handleReserveClick(room.room_names, room.image_paths)
+              }
             />
           ))}
         </div>
@@ -88,9 +88,9 @@ function App() {
         {/* Popup */}
         <PopupRoom
           isOpen={isPopupOpen}
-          subcategory={subcategories} // Pass the filtered subcategories
           onClose={handleClosePopup}
           title={selectedRoomTitle}
+          imagePaths={selectedRoomImages} // Pass images to PopupRoom
         />
       </div>
     </div>

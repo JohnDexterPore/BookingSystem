@@ -48,7 +48,7 @@ function SidebarWithBurgerMenu() {
           <div className="mb-2 flex items-center gap-4 p-4">
             <img
               className="size-12"
-              src="./src/assets/img/frontlogo.png"
+              src="https://bonchon.com.ph/storage/cms_images/F2y4LTagCiGIOr8Y1fHcQZeM5cOaE661oABy6ftT.png"
               alt="Bonchon Logo"
             />
             <Typography variant="h5" color="blue-gray">
